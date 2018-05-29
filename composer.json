@@ -20,10 +20,5 @@
     "target-dir": "Lle/MailerBundle",
     "autoload": {
         "psr-0": { "Lle\\MailBundle": "" }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0.0"
-        }
     }
 }
