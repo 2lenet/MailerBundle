@@ -1,5 +1,5 @@
 {
-    "name": "lle/mailer-bundle",
+    "name": "2lenet/mailer-bundle",
     "type": "symfony-bundle",
     "description": "The 2LE's mailbundle.",
     "keywords": ["lle", "mail"],
