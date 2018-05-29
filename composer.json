@@ -1,0 +1,29 @@
+{
+    "name": "lle/mailer-bundle",
+    "type": "symfony-bundle",
+    "description": "The 2LE's mailbundle.",
+    "keywords": ["lle", "mail"],
+    "homepage": "http://www.2le.net",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "2LE Team",
+            "homepage": "http://www.2le.net/",
+            "email": "support@2le.net"
+        }
+    ],
+    "require": {
+	      "php": ">=7.1",
+        "symfony/symfony": "~4.0"
+    },
+    "minimum-stability": "dev",
+    "target-dir": "Lle/MailerBundle",
+    "autoload": {
+        "psr-0": { "Lle\\MailBundle": "" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.0"
+        }
+    }
+}
