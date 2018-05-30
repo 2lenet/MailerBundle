@@ -13,11 +13,23 @@
         }
     ],
     "require": {
-	      "php": ">=7.1"
+	      "php": ">=7.1",
+        "symfony/orm-pack": "dev-master"
     },
     "minimum-stability": "dev",
     "target-dir": "Lle/MailerBundle",
     "autoload": {
-        "psr-0": { "Lle\\MailBundle": "" }
+        "psr-4": {
+            "Lle\\MailerBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Lle\\MailerBundle\\Tests\\": "tests/"
+        }
+    },
+ 
+    "require-dev": {
+        "phpunit/phpunit": "^7.2@dev"
     }
 }
