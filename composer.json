@@ -13,8 +13,7 @@
         }
     ],
     "require": {
-	      "php": ">=7.1",
-        "symfony/orm-pack": "dev-master"
+	      "php": ">=7.1"
     },
     "minimum-stability": "dev",
     "autoload": {
