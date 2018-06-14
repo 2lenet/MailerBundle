@@ -53,7 +53,9 @@ class Template
     /**
      *
      * @var string
-     * @Assert\Email()
+     * @Assert\Email(
+     *  checkMX = true
+     * )
      * @Assert\NotBlank()
      * @ORM\Column(name="expediteur_mail", type="string", nullable=true)
      */

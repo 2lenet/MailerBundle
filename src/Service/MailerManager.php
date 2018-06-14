@@ -100,6 +100,11 @@ class MailerManager
         $templateHtml = $this->twig->createTemplate($mail->getTemplate()->getHtml());
         $templateText = $this->twig->createTemplate($mail->getTemplate()->getText());
         $templateSujet = $this->twig->createTemplate($mail->getTemplate()->getSujet());
+        if ($mail->getExpediteur()) {
+            $expediteur = array($mail->getExpediteur() => $mail->getAlias());
+        } else {
+            $expediteur = array($mail->getTemplate()->getExpediteurMail() => $mail->getTemplate()->getExpediteurName());
+        }
 
         /** @var Destinataire $destinataire */
         foreach ($mail->getDestinataires() as $destinataire) {
@@ -115,7 +120,7 @@ class MailerManager
             //$html .= '<img src="' . $urlTracking . '" alt="">';
             $message = (new \Swift_Message())
                     ->setSubject($sujet)
-                    ->setFrom(array($mail->getExpediteur() => $mail->getAlias()))
+                    ->setFrom($expediteur)
                     ->setReturnPath($mail->getReturnPath())
                     ->setTo($destinataire->getEmail())
                     ->setReplyTo($mail->getReplyTo())
