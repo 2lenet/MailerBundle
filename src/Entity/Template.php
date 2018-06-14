@@ -1,7 +1,9 @@
 <?php
 
-namespace  Lle\MailerBundle\Entity;
+namespace Lle\MailerBundle\Entity;
+
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Model
@@ -9,7 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="lle_mailer_template")
  * @ORM\Entity(repositoryClass="Lle\MailerBundle\Entity\TemplateRepository")
  */
-class Template {
+class Template
+{
 
     /**
      * @var integer
@@ -19,6 +22,7 @@ class Template {
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
+
     /**
      * @var string
      *
@@ -41,13 +45,31 @@ class Template {
     private $sujet;
 
     /**
+     * @Assert\NotBlank()
      * @ORM\Column(name="code", type="string", nullable=true)
      */
     protected $code;
 
+    /**
+     *
+     * @var string
+     * @Assert\Email()
+     * @Assert\NotBlank()
+     * @ORM\Column(name="expediteur_mail", type="string", nullable=true)
+     */
+    protected $expediteurMail;
+
+    /**
+     *
+     * @var string
+     * @Assert\NotBlank()
+     * @ORM\Column(name="expediteur_name", type="string", nullable=true)
+     */
+    protected $expediteurName;
+
     public function __toString()
     {
-        return (string)$this->getSujet();
+        return (string) $this->getSujet();
     }
 
     /**
@@ -151,4 +173,25 @@ class Template {
     {
         return $this->code;
     }
+
+    function getExpediteurMail()
+    {
+        return $this->expediteurMail;
+    }
+
+    function getExpediteurName()
+    {
+        return $this->expediteurName;
+    }
+
+    function setExpediteurMail($expediteurMail)
+    {
+        $this->expediteurMail = $expediteurMail;
+    }
+
+    function setExpediteurName($expediteurName)
+    {
+        $this->expediteurName = $expediteurName;
+    }
+
 }
