@@ -1,6 +1,6 @@
 <?php
 
-namespace Lle\MailBundle\Entity;
+namespace Lle\MailerBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Destinataire
  *
  * @ORM\Table(name="lle_mail_rejet")
- * @ORM\Entity(repositoryClass="Lle\MailBundle\Entity\RejetRepository")
+ * @ORM\Entity(repositoryClass="Lle\MailerBundle\Entity\RejetRepository")
  */
 class Rejet {
 

@@ -525,7 +525,7 @@ class Mail
     /**
      * Get template
      *
-     * @return \Lle\MailBundle\Entity\Template
+     * @return \Lle\MailerBundle\Entity\Template
      */
     public function getTemplate()
     {

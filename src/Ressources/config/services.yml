@@ -1,0 +1,9 @@
+services:
+    lle.mailer.mail_manager:
+        class: Lle\MailerBundle\Service\MailManager
+        public: true
+        arguments:
+            - '@doctrine.orm.default_entity_manager'
+            - '@router.default'
+            - '@swiftmailer.mailer'
+    Lle\MailerBundle\Service\MailManager: '@lle.mailer.mail_manager'

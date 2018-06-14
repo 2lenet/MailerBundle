@@ -1,26 +1,36 @@
 <?php
-namespace Lle\MailBundle\Service;
 
+namespace Lle\MailerBundle\Service;
 
-use Symfony\Component\HttpFoundation\Response;
-use Lle\MailBundle\Entity\Mail;
-use Lle\MailBundle\Entity\Destinataire;
-use Symfony\Component\Routing\Router;
+use Doctrine\ORM\EntityManagerInterface;
+use Lle\MailerBundle\Entity\Mail;
+use Lle\MailerBundle\Entity\Destinataire;
+use Symfony\Component\Routing\RouterInterface;
 
+class MailManager
+{
 
-class MailManager{
-    private $container;
+    /**
+     * @var EntityManagerInterface
+     */
     private $em;
 
-    public function __construct($container) {
-        $this->container = $container;
-        $this->em = $this->container->get('doctrine.orm.entity_manager');
-    }
+    /**
+     * @var RouterInterface
+     */
+    private $router;
 
-    private function get($name){
-        return $this->container->get($name);
-    }
+    /**
+     * @var \Swift_Mailer
+     */
+    private $mailer;
 
+    public function __construct(EntityManagerInterface $em, RouterInterface $router, \Swift_Mailer $mailer)
+    {
+        $this->em = $em;
+        $this->router = $router;
+        $this->mailer = $mailer;
+    }
 
     /**
      * @param string $code
@@ -28,14 +38,15 @@ class MailManager{
      * @return Mail
      * @throws \Exception
      */
-    public function create($code, $destinataires, $expediteur = ['2le' => '2le@2le.net'], $returnPath = null){
-        $template = $this->em->getRepository('LleMailBundle:Template')->findOneBy(array('code'=>$code));
-        if(!$template){
-            throw new \Exception('Code '.$code.' ne correspond a aucun template d\'email');
+    public function create($code, $destinataires, $expediteur = ['2le' => '2le@2le.net'], $returnPath = null)
+    {
+        $template = $this->em->getRepository('LleMailerBundle:Template')->findOneBy(array('code' => $code));
+        if (!$template) {
+            throw new \Exception('Code ' . $code . ' ne correspond a aucun template d\'email');
         }
         $mail = new Mail();
-        foreach($destinataires as $k => $destinataire){
-            $mail->addDestinataire($this->createDestinataire($k,$destinataire));
+        foreach ($destinataires as $k => $destinataire) {
+            $mail->addDestinataire($this->createDestinataire($k, $destinataire));
         }
         $mail->setExpediteur(current($expediteur));
         $mail->setReplyTo(current($expediteur));
@@ -54,10 +65,11 @@ class MailManager{
      * @return Mail
      * @throws \Exception
      */
-    public function createFromHtml($html, $sujet, $destinataires, $expediteur = ['2le' => '2le@2le.net'], $returnPath = null){
+    public function createFromHtml($html, $sujet, $destinataires, $expediteur = ['2le' => '2le@2le.net'], $returnPath = null)
+    {
         $mail = new Mail();
-        foreach($destinataires as $k => $destinataire){
-            $mail->addDestinataire($this->createDestinataire($k,$destinataire));
+        foreach ($destinataires as $k => $destinataire) {
+            $mail->addDestinataire($this->createDestinataire($k, $destinataire));
         }
         $mail->setExpediteur(current($expediteur));
         $mail->setReplyTo(current($expediteur));
@@ -75,27 +87,27 @@ class MailManager{
      * @param Mail $mail
      * @return Mail
      */
-    public function send(Mail $mail){
+    public function send(Mail $mail)
+    {
         $mail->setDateEnvoi(new \Datetime());
         /** @var Destinataire $destinataire */
-        foreach($mail->getDestinataires() as $destinataire){
+        foreach ($mail->getDestinataires() as $destinataire) {
             /** @var Router $router */
-            $router = $this->get('router');
-            $urlTracking = $router->generate('llemailbundle_admin_tracking', array('id_mail'=>$mail->getId(),'id_destinataire'=>$destinataire->getId()), true);
-            $urlRedirect = $this->get('router')->generate('llemailbundle_admin_tracking_redirect',array('id_mail'=>$mail->getId(),'id_destinataire'=>$destinataire->getId()),true);
+            $urlTracking = $this->router->generate('llemailbundle_admin_tracking', array('id_mail' => $mail->getId(), 'id_destinataire' => $destinataire->getId()), true);
+            $urlRedirect = $this->router->generate('llemailbundle_admin_tracking_redirect', array('id_mail' => $mail->getId(), 'id_destinataire' => $destinataire->getId()), true);
             $html = $mail->render($destinataire);
             $text = $mail->renderPlainText($destinataire);
-            $html = $mail->rewriteUrl($destinataire,$urlRedirect, $html);
-            $html.= '<img src="'.$urlTracking.'" alt="">';
+            $html = $mail->rewriteUrl($destinataire, $urlRedirect, $html);
+            $html .= '<img src="' . $urlTracking . '" alt="">';
             $message = \Swift_Message::newInstance()
-                ->setSubject($mail->renderSujet())
-                ->setFrom(array($mail->getExpediteur()=>$mail->getAlias()))
-                ->setReturnPath($mail->getReturnPath())
-                ->setTo($destinataire->getEmail())
-                ->setReplyTo($mail->getReplyTo())
-                ->setBody($html, 'text/html')
-                ->addPart($text, 'text/plain');
-            $mail->setEnvoyer($this->get('mailer')->send($message));
+                    ->setSubject($mail->renderSujet())
+                    ->setFrom(array($mail->getExpediteur() => $mail->getAlias()))
+                    ->setReturnPath($mail->getReturnPath())
+                    ->setTo($destinataire->getEmail())
+                    ->setReplyTo($mail->getReplyTo())
+                    ->setBody($html, 'text/html')
+                    ->addPart($text, 'text/plain');
+            $mail->setEnvoyer($this->mailer->send($message));
             $destinataire->setDateEnvoi(new \DateTime('now'));
             $this->em->persist($destinataire);
         }
@@ -104,20 +116,19 @@ class MailManager{
         return $this->save($mail);
     }
 
-
-    public function createDestinataire($email,$data){
+    public function createDestinataire($email, $data)
+    {
         $destinataire = new Destinataire();
         $destinataire->setData($data);
         $destinataire->setEmail($email);
         return $destinataire;
     }
 
-    private function save($item){
+    private function save($item)
+    {
         $this->em->persist($item);
         $this->em->flush();
         return $item;
     }
-
-
 
 }
