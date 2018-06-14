@@ -3,7 +3,6 @@
 namespace Lle\MailerBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Lle\MailerBundleBundle\lib\Renderer\CallbackReplace;
 use Symfony\Component\Validator\Constraints as Assert;
 use Lle\MailerBundleBundle\lib\Api;
 use Lle\MailerBundleBundle\lib\Sender\SenderFactory;

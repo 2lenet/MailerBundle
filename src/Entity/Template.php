@@ -50,37 +50,6 @@ class Template {
         return (string)$this->getSujet();
     }
 
-    public function render($destinataire = null){
-        $destinataire = ($destinataire)? $destinataire:$this->destinataires->first();
-        return $this->twig($this->getHtml(),$this->getAllData($destinataire));
-    }
-
-    public function renderPlainText($destinataire = null){
-        $destinataire = ($destinataire)? $destinataire:$this->destinataires->first();
-        $text = "";
-        if ($this->getTemplate()) {
-            $text = $this->getTemplate()->getText();
-        }
-        return $this->twig($text, $this->getAllData($destinataire));
-    }
-
-    public function renderSujet($destinataire = null){
-        $destinataire = ($destinataire)? $destinataire:$this->destinataires->first();
-        return $this->twig($this->getSujet(),$this->getAllData($destinataire));
-    }
-
-    private function twig($html,$vars){
-        $loader = new \Twig_Loader_String();
-        $twig = new \Twig_Environment($loader);
-        try{
-            $texte = $twig->render($html,$vars);
-        }catch(\Exception $e){
-            $this->error = $e->getMessage();
-            $texte = false;
-        }
-        return $texte;
-    }
-
     /**
      * Get id
      *

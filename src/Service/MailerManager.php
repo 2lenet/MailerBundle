@@ -21,12 +21,18 @@ class MailerManager
     private $router;
 
     /**
+     * @var Twig
+     */
+    private $twig;
+
+    /**
      * @var \Swift_Mailer
      */
     private $mailer;
 
-    public function __construct(EntityManagerInterface $em, RouterInterface $router, \Swift_Mailer $mailer)
+    public function __construct(EntityManagerInterface $em, RouterInterface $router, \Swift_Mailer $mailer, \Twig_Environment $twig )
     {
+        $this->twig = $twig;
         $this->em = $em;
         $this->router = $router;
         $this->mailer = $mailer;
@@ -90,24 +96,32 @@ class MailerManager
     public function send(Mail $mail)
     {
         $mail->setDateEnvoi(new \Datetime());
+
+        $templateHtml = $this->twig->createTemplate($mail->getTemplate()->getHtml());
+        $templateText = $this->twig->createTemplate($mail->getTemplate()->getText());
+        $templateSujet = $this->twig->createTemplate($mail->getTemplate()->getSujet());
+
         /** @var Destinataire $destinataire */
         foreach ($mail->getDestinataires() as $destinataire) {
             /** @var Router $router */
-            $urlTracking = $this->router->generate('llemailbundle_admin_tracking', array('id_mail' => $mail->getId(), 'id_destinataire' => $destinataire->getId()), true);
-            $urlRedirect = $this->router->generate('llemailbundle_admin_tracking_redirect', array('id_mail' => $mail->getId(), 'id_destinataire' => $destinataire->getId()), true);
-            $html = $mail->render($destinataire);
-            $text = $mail->renderPlainText($destinataire);
-            $html = $mail->rewriteUrl($destinataire, $urlRedirect, $html);
-            $html .= '<img src="' . $urlTracking . '" alt="">';
-            $message = \Swift_Message::newInstance()
-                    ->setSubject($mail->renderSujet())
+            //$urlTracking = $this->router->generate('llemailbundle_admin_tracking', array('id_mail' => $mail->getId(), 'id_destinataire' => $destinataire->getId()), true);
+            //$urlRedirect = $this->router->generate('llemailbundle_admin_tracking_redirect', array('id_mail' => $mail->getId(), 'id_destinataire' => $destinataire->getId()), true);
+
+            $html = $templateHtml->render($destinataire->getData());
+            $text = $templateText->render($destinataire->getData());
+            $sujet = $templateSujet->render($destinataire->getData());
+
+            //$html = $mail->rewriteUrl($destinataire, $urlRedirect, $html);
+            //$html .= '<img src="' . $urlTracking . '" alt="">';
+            $message = (new \Swift_Message())
+                    ->setSubject($sujet)
                     ->setFrom(array($mail->getExpediteur() => $mail->getAlias()))
                     ->setReturnPath($mail->getReturnPath())
                     ->setTo($destinataire->getEmail())
                     ->setReplyTo($mail->getReplyTo())
                     ->setBody($html, 'text/html')
                     ->addPart($text, 'text/plain');
-            $mail->setEnvoyer($this->mailer->send($message));
+            $mail->setEnvoye($this->mailer->send($message));
             $destinataire->setDateEnvoi(new \DateTime('now'));
             $this->em->persist($destinataire);
         }
