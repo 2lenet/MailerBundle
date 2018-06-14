@@ -7,7 +7,7 @@ use Lle\MailerBundle\Entity\Mail;
 use Lle\MailerBundle\Entity\Destinataire;
 use Symfony\Component\Routing\RouterInterface;
 
-class MailManager
+class MailerManager
 {
 
     /**

@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Loader;
  *
  * @see http://symfony.com/doc/current/cookbook/bundles/extension.html
  */
-class LleMailerBundleExtension extends Extension
+class LleMailerExtension extends Extension
 {
 
     /**
@@ -20,9 +20,8 @@ class LleMailerBundleExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        die('ok');
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
-        $loader->load('services.yml');
+        $loader->load('services.yaml');
         $configuration = new Configuration();
         $processedConfig =  $this->processConfiguration($configuration, $configs);
     }
