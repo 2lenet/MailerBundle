@@ -16,14 +16,19 @@ $ composer require 2lenet/mailer-bundle
 
 ```php
 
-        $configs = ['titre' => '$alerte->getTitre(), 'contenu' => $alerte->getContenu()];
-  	    $userList = ['2le@2le.net','jules@2le.net'];
+function mailAction(MailerManager $mailerManager) {
 
-        $destinataires = [];
-        foreach ($userList as $user) {
-            $destinataires[$user] = $configs;
-        }
-        $mailBundle = $this->get('lle_mail_manager');
-        $mail = $mailBundle->create($alerte->getCodeTemplateMail(), $destinataires, ["Soléa" => "noreply@solea.info"]);
-        $mailBundle->send($mail);
+        $destinataires = array(); // array of dest.
+        
+        $email = '2le@2le.net';
+        $data = '{"nom":"Sébastien"}'; // data is json string
+        $dest = $mailerManager->createDestinataire('2le@2le.net', $data);
+        $destinataires[] = dest; // add one dest to array
+
+        //  create($code, $destinataires, $expediteur = ['2le' => '2le@2le.net'], $returnPath = null)
+        
+        $mail = $mailerService->create('CODE_MODELE', $destinataires); // create mail for all destinataires
+        $mailService->send($mail);  // send the mail
+}
+
 ```
