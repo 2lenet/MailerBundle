@@ -178,19 +178,7 @@ class Destinataire
         return $this;
     }
 
-    /**
-     * Get url
-     *
-     * @return string
-     */
-    public function getUrl()
-    {
-        $factory = new SenderFactory();
-        $sender = $factory->getSender($this->getMail());
-        return $sender->getUrlDest($this);
-    }
-
-    public function gurl(){
+    public function getUrl(){
         return json_decode($this->url,true);
     }
 
