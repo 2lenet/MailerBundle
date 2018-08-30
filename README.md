@@ -31,6 +31,63 @@ $ composer require 2lenet/mailer-bundle
 If you want to display the emails / display,edit and show the templates / display the receivers you need the bundle **esayadminplus** and the different configuration files : 
 https://packagist.org/packages/2lenet/easyadmin-plus-bundle
 
+
+menu.yaml
+```yaml
+easy_admin:
+    design:
+        menu:
+            -
+                label: menu.accueil
+                route: home
+                icon: home
+            -
+                label: menu.echeance
+                entity: Controle
+                icon: bell-o
+            -
+                label: menu.ressource
+                url: '/service.core/ressources?menuIndex=2&submenuIndex=0'
+                icon: clone
+            -
+                label: menu.obligation
+                entity: Obligation
+                icon: bell
+            -
+                label: menu.suivi
+                icon: wrench
+                children:
+                    - { entity: Rapport, label: menu.rapport, icon: file-text }
+                    - { entity: Ticket, label: ticket.liste.nom, icon: ticket }
+                    - { label: menu.import_rapport, url: 'http://rapport.nathyslog.com', icon: sign-in }
+            -
+                label: menu.parametrage
+                icon: gear
+                children:
+                    - { entity: Service, label: menu.service, icon: sitemap }
+                    - { entity: Gabarit, label: menu.categorie_ressource }
+                    - { entity: Responsableobligation, label: menu.responsableobligation, icon: users }
+                    - { entity: Rubrique, label: menu.rubrique, icon: cubes }
+                    - { entity: Attributserviceclient, label: menu.attribut_service, icon: crosshairs }
+                    - { entity: TypeTicket, label: typeTicket.liste.nom, icon: list }
+                    - { entity: Priorite, label: priorite.liste.nom, icon: sort }
+            -
+                label: menu.admin_generale
+                icon: cogs
+                children:
+                    - { entity: Client, label: menu.client, default: true }
+                    - { entity: Categorie, label: menu.categorie }
+                    - { entity: Typegabarit, label: menu.type_categorie_ressource }
+                    - { entity: Typerapport, label: menu.type_rapport }
+                    - { entity: Typeresponsabilite, label: menu.typeresponsabilite }
+                    - { entity: Theme, label: menu.theme }
+                    - { entity: Typecontrole, label: menu.typecontrole }
+                    - { entity: Template, label: menu.template }
+                    - { entity: Mail, label: menu.mail }
+```
+
+
+Mail.yaml
 ``` yaml
     easy_admin:
     entities:
@@ -79,8 +136,8 @@ https://packagist.org/packages/2lenet/easyadmin-plus-bundle
                     - { type: 'sublist', id: 'destinataires', label: 'tab.destinataires', entity: 'Destinataire', property: 'Destinataires'}                    
 ```
 
+Template.yaml
 ``` yaml
-
 easy_admin:
     entities:
         Template:
@@ -137,8 +194,8 @@ easy_admin:
                     - { property: html, label: field.html }                                        
 ```
 
+Destinataire.yaml
 ```yaml 
-
 easy_admin:
     entities:
         Destinataire:
