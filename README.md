@@ -15,20 +15,15 @@ $ composer require 2lenet/mailer-bundle
 ### Usage
 
 ```php
+    function index(MailerManager $mailerManager) {
 
-function mailAction(MailerManager $mailerManager) {
-
-        $destinataires = array(); // array of dest.
+        $destinataires = [
+            '2le@2le.net' => ["nom" =>"Sébastien"],
+            'jules@2le.net' => ["nom" =>"Jules"]
+        ];
         
-        $email = '2le@2le.net';
-        $data = '{"nom":"Sébastien"}'; // data is json string
-        $dest = $mailerManager->createDestinataire('2le@2le.net', $data);
-        $destinataires[] = dest; // add one dest to array
-
-        //  create($code, $destinataires, $expediteur = ['2le' => '2le@2le.net'], $returnPath = null)
-        
-        $mail = $mailerService->create('CODE_MODELE', $destinataires); // create mail for all destinataires
-        $mailService->send($mail);  // send the mail
-}
+        $mail = $mailerManager->create('TEST', $destinataires); // create mail for all destinataires
+        $mailerManager->send($mail);  // send the mail
+    }    
 
 ```
