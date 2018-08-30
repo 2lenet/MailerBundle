@@ -99,12 +99,6 @@ class Destinataire
     }
 
 
-    public function getDonnesVide(){
-        $factory = new SenderFactory();
-        $sender = $factory->getSender($this->getMail());
-        return $sender->getColumnDestinataires($this->getData());
-    }
-
     /**
      * Set dateEnvoi
      *
@@ -141,19 +135,7 @@ class Destinataire
         return $this;
     }
 
-    /**
-     * Get dateOuvert
-     *
-     * @return \DateTime
-     */
-    public function getDateOuvert()
-    {
-        $factory = new SenderFactory();
-        $sender = $factory->getSender($this->getMail());
-        return $sender->getDateOuvert($this);
-    }
-
-    public function gdateOuvert(){
+    public function getDateOuvert(){
         return $this->dateOuvert;
     }
 
