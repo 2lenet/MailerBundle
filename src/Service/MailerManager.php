@@ -13,22 +13,22 @@ class MailerManager
     /**
      * @var EntityManagerInterface
      */
-    private $em;
+    protected $em;
 
     /**
      * @var RouterInterface
      */
-    private $router;
+    protected $router;
 
     /**
      * @var Twig
      */
-    private $twig;
+    protected $twig;
 
     /**
      * @var \Swift_Mailer
      */
-    private $mailer;
+    protected $mailer;
 
     public function __construct(EntityManagerInterface $em, RouterInterface $router, \Swift_Mailer $mailer, \Twig_Environment $twig )
     {
@@ -36,6 +36,18 @@ class MailerManager
         $this->em = $em;
         $this->router = $router;
         $this->mailer = $mailer;
+    }
+
+    protected function findTemplate($code) {
+        $template = $this->em->getRepository('LleMailerBundle:Template')->findOneBy(array('code' => $code));
+        if (!$template) {
+            throw new \Exception('Code ' . $code . ' ne correspond a aucun template d\'email');
+        }
+        return $template;
+    }
+
+    protected function createMail() {
+        return new Mail();
     }
 
     /**
@@ -46,11 +58,8 @@ class MailerManager
      */
     public function create($code, $destinataires, $expediteur = ['2le' => '2le@2le.net'], $returnPath = null)
     {
-        $template = $this->em->getRepository('LleMailerBundle:Template')->findOneBy(array('code' => $code));
-        if (!$template) {
-            throw new \Exception('Code ' . $code . ' ne correspond a aucun template d\'email');
-        }
-        $mail = new Mail();
+        $template = $this->findTemplate($code);
+        $mail = $this->createMail();
         foreach ($destinataires as $k => $destinataire) {
             $mail->addDestinataire($this->createDestinataire($k, $destinataire));
         }
@@ -73,7 +82,7 @@ class MailerManager
      */
     public function createFromHtml($html, $sujet, $destinataires, $expediteur = ['2le' => '2le@2le.net'], $returnPath = null)
     {
-        $mail = new Mail();
+        $mail = $this->createMail();
         foreach ($destinataires as $k => $destinataire) {
             $mail->addDestinataire($this->createDestinataire($k, $destinataire));
         }
