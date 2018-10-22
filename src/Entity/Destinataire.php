@@ -2,9 +2,10 @@
 
 namespace Lle\MailerBundle\Entity;
 
-use Lle\MailerBundle\Lib\Sender\SenderFactory;
-
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Constraints\Email;
 
 /**
  * Destinataire
@@ -22,49 +23,52 @@ class Destinataire
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
+    
     /**
      * @var string
      *
      * @ORM\Column(name="email", type="string", length=255)
+     * @Assert\Email(
+     *     checkMX = true
+     * )
      */
     private $email;
-
+    
     /**
      * @var string
      *
      * @ORM\Column(name="data", type="json")
      */
     private $data;
-
+    
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="date_envoi", type="datetime", nullable=true)
      */
     private $dateEnvoi;
-
+    
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="date_ouvert", type="datetime", nullable=true)
      */
     private $dateOuvert;
-
+    
     /**
      * @var string
      *
      * @ORM\Column(name="url", type="text", nullable=true)
      */
     private $url;
-
-     /**
+    
+    /**
      * @ORM\ManyToOne(targetEntity="Mail",cascade={"persist"},inversedBy="destinataires")
      * @ORM\JoinColumn(name="mail_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $mail;
-
-
+    
+    
     /**
      * Get id
      *
@@ -74,7 +78,7 @@ class Destinataire
     {
         return $this->id;
     }
-
+    
     /**
      * Set email
      *
@@ -84,10 +88,10 @@ class Destinataire
     public function setEmail($email)
     {
         $this->email = $email;
-
+        
         return $this;
     }
-
+    
     /**
      * Get email
      *
@@ -97,8 +101,8 @@ class Destinataire
     {
         return $this->email;
     }
-
-
+    
+    
     /**
      * Set dateEnvoi
      *
@@ -108,10 +112,10 @@ class Destinataire
     public function setDateEnvoi($dateEnvoi)
     {
         $this->dateEnvoi = $dateEnvoi;
-
+        
         return $this;
     }
-
+    
     /**
      * Get dateEnvoi
      *
@@ -121,7 +125,7 @@ class Destinataire
     {
         return $this->dateEnvoi;
     }
-
+    
     /**
      * Set dateOuvert
      *
@@ -131,22 +135,22 @@ class Destinataire
     public function setDateOuvert($dateOuvert)
     {
         $this->dateOuvert = $dateOuvert;
-
+        
         return $this;
     }
-
+    
     public function getDateOuvert(){
         return $this->dateOuvert;
     }
-
+    
     public function isDateOuvertDispo(){
         return !is_string($this->getDateOuvert());
     }
-
+    
     public function isUrlDispo(){
         return !is_string($this->getUrl());
     }
-
+    
     /**
      * Set url
      *
@@ -156,24 +160,24 @@ class Destinataire
     public function setUrl($url)
     {
         $this->url = json_encode($url);
-
+        
         return $this;
     }
-
+    
     public function getUrl(){
         return json_decode($this->url,true);
     }
-
+    
     public function addUrl($url){
         $urls = $this->getUrl();
         $urls[] = $url;
         $this->setUrl($urls);
     }
-
+    
     /**
      * Set mail
      *
-     * @param \Lle\MailerBundle\Entity\Mail $mail
+     * @param Mail $mail
      * @return Destinataire
      */
     public function setMail(Mail $mail = null)
@@ -181,19 +185,19 @@ class Destinataire
         $this->mail = $mail;
         return $this;
     }
-
+    
     /**
      * Get mail
      *
-     * @return \Lle\MailerBundle\Entity\Mail
+     * @return Mail
      */
     public function getMail()
     {
         return $this->mail;
     }
-
-
-
+    
+    
+    
     /**
      * Set data
      *
@@ -203,10 +207,10 @@ class Destinataire
     public function setData($data)
     {
         $this->data = $data;
-
+        
         return $this;
     }
-
+    
     /**
      * Get data
      *
@@ -215,5 +219,26 @@ class Destinataire
     public function getData()
     {
         return $this->data;
+    }
+    
+    /**
+     * @param boolean $checkMX
+     * @param boolean $checkHost
+     * @return bool
+     */
+    public function isValidEmail($checkMX = false, $checkHost = false) :bool
+    {
+        $emailValidator = new Email();
+        $emailValidator->checkMX = $checkMX;
+        $emailValidator->checkHost = $checkHost;
+        $validator = Validation::createValidator();
+        $violations = $validator->validate($this->email, array(
+            $emailValidator
+        ));
+        
+        if (0 !== count($violations)) {
+            return false;
+        }
+        return true;
     }
 }
