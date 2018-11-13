@@ -56,6 +56,11 @@ class MailerManager
     {
         return new Mail();
     }
+    
+    public function has($code){
+        $template = $this->em->getRepository('LleMailerBundle:Template')->findOneBy(array('code' => $code));
+        return (bool) $template;
+    }
 
     /**
      *
