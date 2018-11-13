@@ -79,7 +79,7 @@ class Destinataire
      *
      * @var bool
      *
-     * @ORM\Column(name="success", type="boolean", nullable=false)
+     * @ORM\Column(name="success", type="boolean", nullable=true)
      */
     protected $success;
 
