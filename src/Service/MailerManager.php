@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Lle\MailerBundle\Entity\Mail;
 use Lle\MailerBundle\Entity\Destinataire;
 use Symfony\Component\Routing\RouterInterface;
+use Lle\MailerBundle\MailInterface;
 
 class MailerManager
 {
@@ -50,6 +51,17 @@ class MailerManager
         if (!$template) {
             throw new \Exception('Code ' . $code . ' ne correspond a aucun template d\'email');
         }
+        $this->createFromTemplate($template, $destinataires, $expediteur, $returnPath);
+    }
+
+    /**
+     * @param $template
+     * @param array  $destinataires
+     * @return Mail
+     * @throws \Exception
+     */
+    public function createFromTemplate($template, $destinataire, $expediteur = ['2le' => '2le@2le.net'], $returnPath = null) 
+    {
         $mail = new Mail();
         foreach ($destinataires as $k => $destinataire) {
             $mail->addDestinataire($this->createDestinataire($k, $destinataire));
@@ -90,10 +102,10 @@ class MailerManager
     }
 
     /**
-     * @param Mail $mail
-     * @return Mail
+     * @param MailInterface $mail
+     * @return MailInterface
      */
-    public function send(Mail $mail)
+    public function send(MailInterface $mail)
     {
         $mail->setDateEnvoi(new \Datetime());
 
