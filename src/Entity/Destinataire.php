@@ -1,10 +1,10 @@
 <?php
-
 namespace Lle\MailerBundle\Entity;
 
-use Lle\MailerBundle\Lib\Sender\SenderFactory;
-
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Constraints\Email;
 
 /**
  * Destinataire
@@ -14,7 +14,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Destinataire
 {
+
     /**
+     *
      * @var integer
      *
      * @ORM\Column(name="id", type="integer")
@@ -24,13 +26,18 @@ class Destinataire
     private $id;
 
     /**
+     *
      * @var string
      *
      * @ORM\Column(name="email", type="string", length=255)
+     * @Assert\Email(
+     *     checkMX = true
+     * )
      */
     private $email;
 
     /**
+     *
      * @var string
      *
      * @ORM\Column(name="data", type="json")
@@ -38,6 +45,7 @@ class Destinataire
     private $data;
 
     /**
+     *
      * @var \DateTime
      *
      * @ORM\Column(name="date_envoi", type="datetime", nullable=true)
@@ -45,6 +53,7 @@ class Destinataire
     private $dateEnvoi;
 
     /**
+     *
      * @var \DateTime
      *
      * @ORM\Column(name="date_ouvert", type="datetime", nullable=true)
@@ -52,18 +61,27 @@ class Destinataire
     private $dateOuvert;
 
     /**
+     *
      * @var string
      *
      * @ORM\Column(name="url", type="text", nullable=true)
      */
     private $url;
 
-     /**
+    /**
+     *
      * @ORM\ManyToOne(targetEntity="Mail",cascade={"persist"},inversedBy="destinataires")
      * @ORM\JoinColumn(name="mail_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $mail;
 
+    /**
+     *
+     * @var bool
+     *
+     * @ORM\Column(name="success", type="boolean", nullable=true)
+     */
+    protected $success;
 
     /**
      * Get id
@@ -97,7 +115,6 @@ class Destinataire
     {
         return $this->email;
     }
-
 
     /**
      * Set dateEnvoi
@@ -135,16 +152,19 @@ class Destinataire
         return $this;
     }
 
-    public function getDateOuvert(){
+    public function getDateOuvert()
+    {
         return $this->dateOuvert;
     }
 
-    public function isDateOuvertDispo(){
-        return !is_string($this->getDateOuvert());
+    public function isDateOuvertDispo()
+    {
+        return ! is_string($this->getDateOuvert());
     }
 
-    public function isUrlDispo(){
-        return !is_string($this->getUrl());
+    public function isUrlDispo()
+    {
+        return ! is_string($this->getUrl());
     }
 
     /**
@@ -160,11 +180,13 @@ class Destinataire
         return $this;
     }
 
-    public function getUrl(){
-        return json_decode($this->url,true);
+    public function getUrl()
+    {
+        return json_decode($this->url, true);
     }
 
-    public function addUrl($url){
+    public function addUrl($url)
+    {
         $urls = $this->getUrl();
         $urls[] = $url;
         $this->setUrl($urls);
@@ -173,7 +195,7 @@ class Destinataire
     /**
      * Set mail
      *
-     * @param \Lle\MailerBundle\Entity\Mail $mail
+     * @param Mail $mail
      * @return Destinataire
      */
     public function setMail(Mail $mail = null)
@@ -185,14 +207,12 @@ class Destinataire
     /**
      * Get mail
      *
-     * @return \Lle\MailerBundle\Entity\Mail
+     * @return Mail
      */
     public function getMail()
     {
         return $this->mail;
     }
-
-
 
     /**
      * Set data
@@ -215,5 +235,45 @@ class Destinataire
     public function getData()
     {
         return $this->data;
+    }
+
+    /**
+     *
+     * @return bool
+     */
+    public function isSuccess()
+    {
+        return $this->success;
+    }
+
+    /**
+     *
+     * @param bool $success
+     */
+    public function setSuccess($success)
+    {
+        $this->success = $success;
+    }
+
+    /**
+     *
+     * @param boolean $checkMX
+     * @param boolean $checkHost
+     * @return bool
+     */
+    public function isValidEmail($checkMX = false, $checkHost = false): bool
+    {
+        $emailValidator = new Email();
+        $emailValidator->checkMX = $checkMX;
+        $emailValidator->checkHost = $checkHost;
+        $validator = Validation::createValidator();
+        $violations = $validator->validate($this->email, array(
+            $emailValidator
+        ));
+
+        if (0 !== count($violations)) {
+            return false;
+        }
+        return true;
     }
 }
