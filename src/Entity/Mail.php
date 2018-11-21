@@ -5,6 +5,7 @@ namespace Lle\MailerBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Lle\MailerBundle\Traits\MailEntityTrait;
+use Lle\MailerBundle\MailInterface;
 
 /**
  * Mail
@@ -12,7 +13,7 @@ use Lle\MailerBundle\Traits\MailEntityTrait;
  * @ORM\Table(name="lle_mailer_mail")
  * @ORM\Entity(repositoryClass="Lle\MailerBundle\Entity\MailRepository")
  */
-class Mail
+class Mail implements MailInterface
 {
     use MailEntityTrait;
 

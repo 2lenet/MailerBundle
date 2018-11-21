@@ -495,5 +495,30 @@ trait MailEntityTrait
         return $this->replyTo;
     }
 
+
+    /**
+     * Get the value of html
+     *
+     * @return  string
+     */ 
+    public function getHtml()
+    {
+        return $this->html;
+    }
+
+    /**
+     * Set the value of html
+     *
+     * @param  string  $html
+     *
+     * @return  self
+     */ 
+    public function setHtml(string $html)
+    {
+        $this->html = $html;
+
+        return $this;
+    }
+
 }
 

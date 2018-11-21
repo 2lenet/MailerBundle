@@ -2,7 +2,7 @@
 namespace Lle\MailerBundle\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Lle\MailerBundle\Entity\Mail;
+use Lle\MailerBundle\MailInterface;
 use Lle\MailerBundle\Entity\Destinataire;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -66,7 +66,7 @@ class MailerManager
      *
      * @param string $code
      * @param array $destinataires
-     * @return Mail
+     * @return MailInterface
      * @throws \Exception
      */
     public function create($code, $destinataires, $expediteur = ['2le' => '2le@2le.net'], $returnPath = null)
@@ -114,10 +114,10 @@ class MailerManager
 
     /**
      *
-     * @param Mail $mail
-     * @return Mail
+     * @param MailInterface $mail
+     * @return MailInterface
      */
-    public function send(Mail $mail)
+    public function send(MailInterface $mail)
     {
         $mail->setDateEnvoi(new \Datetime());
 
