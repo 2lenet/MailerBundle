@@ -2,7 +2,6 @@
 namespace Lle\MailerBundle\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Lle\MailerBundle\MailInterface;
 use Lle\MailerBundle\Entity\Destinataire;
 use Symfony\Component\Routing\RouterInterface;
 use Lle\MailerBundle\MailInterface;
