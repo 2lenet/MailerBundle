@@ -84,6 +84,22 @@ class Destinataire
     protected $success;
 
     /**
+     *
+     * @var string
+     *
+     * @ORM\Column(name="sujet", type="string", nullable=false)
+     */
+    protected $sujet;
+
+    /**
+     *
+     * @var string
+     *
+     * @ORM\Column(name="html", type="text", nullable=false)
+     */
+    protected $html;
+
+    /**
      * Get id
      *
      * @return integer
@@ -253,6 +269,42 @@ class Destinataire
     public function setSuccess($success)
     {
         $this->success = $success;
+    }
+
+    /**
+     *
+     * @return string
+     */
+    public function getSujet()
+    {
+        return $this->sujet;
+    }
+
+    /**
+     *
+     * @return string
+     */
+    public function getHtml()
+    {
+        return $this->html;
+    }
+
+    /**
+     *
+     * @param string $sujet
+     */
+    public function setSujet($sujet)
+    {
+        $this->sujet = $sujet;
+    }
+
+    /**
+     *
+     * @param string $html
+     */
+    public function setHtml($html)
+    {
+        $this->html = $html;
     }
 
     /**

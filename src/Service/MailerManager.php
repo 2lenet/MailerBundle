@@ -56,9 +56,12 @@ class MailerManager
     {
         return new Mail();
     }
-    
-    public function has($code){
-        $template = $this->em->getRepository('LleMailerBundle:Template')->findOneBy(array('code' => $code));
+
+    public function has($code)
+    {
+        $template = $this->em->getRepository('LleMailerBundle:Template')->findOneBy(array(
+            'code' => $code
+        ));
         return (bool) $template;
     }
 
@@ -113,6 +116,7 @@ class MailerManager
     }
 
     /**
+     *
      * @param MailInterface $mail
      * @return MailInterface
      */
@@ -163,6 +167,8 @@ class MailerManager
                 $destinataire->setSuccess(FALSE);
             }
             $destinataire->setDateEnvoi(new \DateTime('now'));
+            $destinataire->setHtml($html);
+            $destinataire->setSujet($sujet);
             $this->em->persist($destinataire);
         }
         $mail->setDateEnvoiFini(new \Datetime());
