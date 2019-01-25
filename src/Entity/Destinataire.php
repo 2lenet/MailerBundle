@@ -87,7 +87,7 @@ class Destinataire
      *
      * @var string
      *
-     * @ORM\Column(name="sujet", type="string", nullable=false)
+     * @ORM\Column(name="sujet", type="string", nullable=true)
      */
     protected $sujet;
 
@@ -95,7 +95,7 @@ class Destinataire
      *
      * @var string
      *
-     * @ORM\Column(name="html", type="text", nullable=false)
+     * @ORM\Column(name="html", type="text", nullable=true)
      */
     protected $html;
 
