@@ -3,6 +3,7 @@ namespace Lle\MailerBundle\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Lle\MailerBundle\Entity\Destinataire;
+use Lle\MailerBundle\Entity\Template;
 use Symfony\Component\Routing\RouterInterface;
 use Lle\MailerBundle\MailInterface;
 use Lle\MailerBundle\Entity\Mail;
@@ -42,9 +43,10 @@ class MailerManager
         $this->mailer = $mailer;
     }
 
-    protected function findTemplate($code)
+    protected function findTemplate($code): Template
     {
-        $template = $this->em->getRepository('LleMailerBundle:Template')->findOneBy(array(
+        /* @var Template $template */
+        $template = $this->em->getRepository(Template::class)->findOneBy(array(
             'code' => $code
         ));
         if (! $template) {
@@ -53,14 +55,14 @@ class MailerManager
         return $template;
     }
 
-    protected function createMail()
+    protected function createMail(): Mail
     {
         return new Mail();
     }
 
-    public function has($code)
+    public function has($code): bool
     {
-        $template = $this->em->getRepository('LleMailerBundle:Template')->findOneBy(array(
+        $template = $this->em->getRepository(Template::class)->findOneBy(array(
             'code' => $code
         ));
         return (bool) $template;
@@ -70,18 +72,19 @@ class MailerManager
      *
      * @param string $code
      * @param array $destinataires
-     * @return MailInterface
+     * @return Mail
      * @throws \Exception
      */
-    public function create($code, $destinataires, $expediteur = ['2le' => '2le@2le.net'], $returnPath = null)
+    public function create($code, $destinataires, array $expediteur = [], $returnPath = null): Mail
     {
         $template = $this->findTemplate($code);
         $mail = $this->createMail();
         foreach ($destinataires as $k => $destinataire) {
             $mail->addDestinataire($this->createDestinataire($k, $destinataire));
         }
-        $mail->setExpediteur(current($expediteur));
-        $mail->setReplyTo(current($expediteur));
+
+        $mail->setExpediteur($expediteur[0] ?? null);
+        $mail->setReplyTo($expediteur[0] ?? null);
         $mail->setAlias(key($expediteur));
         $mail->setTemplate($template);
         if ($returnPath) {
@@ -98,7 +101,7 @@ class MailerManager
      * @return Mail
      * @throws \Exception
      */
-    public function createFromHtml($html, $sujet, $destinataires, $expediteur = ['2le' => '2le@2le.net'], $returnPath = null)
+    public function createFromHtml($html, $sujet, $destinataires, array $expediteur = [], $returnPath = null): Mail
     {
         $mail = $this->createMail();
         foreach ($destinataires as $k => $destinataire) {
@@ -116,21 +119,13 @@ class MailerManager
         return $this->save($mail);
     }
 
-    /**
-     *
-     * @param MailInterface $mail
-     * @return MailInterface
-     */
-    public function send(MailInterface $mail)
+    public function send(Mail $mail): Mail
     {
         $mail->setDateEnvoi(new \Datetime());
 
-        $templateHtml = $this->twig->createTemplate($mail->getTemplate()
-            ->getHtml());
-        $templateText = $this->twig->createTemplate($mail->getTemplate()
-            ->getText());
-        $templateSujet = $this->twig->createTemplate($mail->getTemplate()
-            ->getSujet());
+        $templateHtml = $this->twig->createTemplate($mail->getTemplate()->getHtml());
+        $templateText = $this->twig->createTemplate($mail->getTemplate()->getText());
+        $templateSujet = $this->twig->createTemplate($mail->getTemplate()->getSujet());
         if ($mail->getExpediteur()) {
             $expediteur = array(
                 $mail->getExpediteur() => $mail->getAlias()
@@ -153,7 +148,6 @@ class MailerManager
 
             // $html = $mail->rewriteUrl($destinataire, $urlRedirect, $html);
             // $html .= '<img src="' . $urlTracking . '" alt="">';
-
             if ($destinataire->isValidEmail(true)) {
                 $message = (new \Swift_Message())->setSubject($sujet)
                     ->setFrom($expediteur)
@@ -177,7 +171,7 @@ class MailerManager
         return $this->save($mail);
     }
 
-    public function createDestinataire($email, $data)
+    public function createDestinataire($email, $data): Destinataire
     {
         $destinataire = new Destinataire();
         $destinataire->setData($data);
