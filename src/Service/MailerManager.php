@@ -43,7 +43,7 @@ class MailerManager
         $this->mailer = $mailer;
     }
 
-    protected function findTemplate($code): Template
+    protected function findTemplate($code)
     {
         /* @var Template $template */
         $template = $this->em->getRepository(Template::class)->findOneBy(array(
@@ -55,7 +55,7 @@ class MailerManager
         return $template;
     }
 
-    protected function createMail(): Mail
+    protected function createMail()
     {
         return new Mail();
     }
