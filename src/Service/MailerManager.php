@@ -156,6 +156,9 @@ class MailerManager
                     ->setReplyTo($mail->getReplyTo())
                     ->setBody($html, 'text/html')
                     ->addPart($text, 'text/plain');
+                foreach($mail->getAttachments() as $attach){
+                    $message->attach(\Swift_Attachment::fromPath($attach));
+                }
                 $mail->setEnvoye($this->mailer->send($message));
                 $destinataire->setSuccess(TRUE);
             } else {

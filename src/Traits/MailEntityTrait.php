@@ -117,6 +117,13 @@ trait MailEntityTrait
      */
     protected $infoSender;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="attachments", type="json_array", nullable=true)
+     */
+    protected $attachments = [];
+
 
     /**
      * Set data
@@ -500,7 +507,7 @@ trait MailEntityTrait
      * Get the value of html
      *
      * @return  string
-     */ 
+     */
     public function getHtml()
     {
         return $this->html;
@@ -512,11 +519,20 @@ trait MailEntityTrait
      * @param  string  $html
      *
      * @return  self
-     */ 
+     */
     public function setHtml(string $html)
     {
         $this->html = $html;
 
+        return $this;
+    }
+
+    public function getAttachments(){
+        return $this->attachments;
+    }
+
+    public function addAttachment(string $attach){
+        $this->attachments[] = $attach;
         return $this;
     }
 
