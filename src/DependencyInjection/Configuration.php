@@ -1,5 +1,9 @@
 <?php
 namespace Lle\MailerBundle\DependencyInjection;
+use Lle\MailerBundle\Entity\Template;
+use Lle\MailerBundle\Entity\Destinataire;
+use Lle\MailerBundle\Entity\Mail;
+use Lle\PdfGeneratorBundle\Entity\PdfModel;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 /**
@@ -16,6 +20,11 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('lle_mailer');
+        $rootNode->children()
+            ->scalarNode('template_class')->defaultValue(Template::class)->end()
+            ->scalarNode('mail_class')->defaultValue(Mail::class)->end()
+            ->scalarNode('destinataire_class')->defaultValue(Destinataire::class)->end()
+            ->scalarNode('check_mx')->defaultValue(true)->end();
         return $treeBuilder;
     }
 }

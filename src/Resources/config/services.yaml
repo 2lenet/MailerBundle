@@ -6,5 +6,5 @@ services:
         autoconfigure: true
 
 
-    Lle\MailerBundle\Service\:
-        resource: '../../Service'
+    Lle\MailerBundle\Service\MailerManager:
+        arguments: ["@doctrine.orm.default_entity_manager", "@router", "@mailer", "@twig", "@parameter_bag"]

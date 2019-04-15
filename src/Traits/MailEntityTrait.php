@@ -3,8 +3,12 @@
 namespace Lle\MailerBundle\Traits;
 
 use Doctrine\ORM\Mapping as ORM;
+use Lle\MailerBundle\Entity\DestinataireInterface;
+use Lle\MailerBundle\Entity\Template;
+use Lle\MailerBundle\Entity\TemplateInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Lle\MailerBundle\Entity\Destinataire;
+
 
 trait MailEntityTrait
 {
@@ -61,11 +65,6 @@ trait MailEntityTrait
 
 
     /**
-     * @ORM\OneToMany(targetEntity="Lle\MailerBundle\Entity\Destinataire",mappedBy="mail", cascade={"persist"})
-     */
-    private $destinataires;
-
-    /**
      * @var string
      * @Assert\Email(
      *     message = "'{{ value }}' n'est pas un email valide.",
@@ -110,6 +109,7 @@ trait MailEntityTrait
      */
     protected $sender;
 
+
     /**
      * @var string
      *
@@ -124,13 +124,41 @@ trait MailEntityTrait
      */
     protected $attachments = [];
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
 
     /**
-     * Set data
+     * Get id
      *
-     * @param string $data
-     * @return Mail
+     * @return integer
      */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setTemplate(TemplateInterface $template)
+    {
+        $this->html = $template->getHtml();
+        $this->sujet = $template->getSujet();
+        $this->template = $template;
+
+        return $this;
+    }
+
+
+    public function getTemplate()
+    {
+        return $this->template;
+    }
+
+
     public function setData($data)
     {
         $this->data = $data;
@@ -138,55 +166,31 @@ trait MailEntityTrait
         return $this;
     }
 
-    /**
-     * Get data
-     *
-     * @return string
-     */
+
     public function getData()
     {
         return $this->data;
     }
 
-    /**
-     * Add destinataires
-     *
-     * @param Destinataire $destinataires
-     * @return Mail
-     */
-    public function addDestinataire(\Lle\MailerBundle\Entity\Destinataire $destinataire)
+    public function addDestinataire(DestinataireInterface $destinataire)
     {
         $destinataire->setMail($this);
         $this->destinataires[] = $destinataire;
         return $this;
     }
 
-    /**
-     * Remove destinataires
-     *
-     * @param Destinataire $destinataires
-     */
-    public function removeDestinataire(\Lle\MailerBundle\Entity\Destinataire $destinataire)
+
+    public function removeDestinataire(DestinataireInterface $destinataire)
     {
         $this->destinataires->removeElement($destinataire);
     }
 
-    /**
-     * Get destinataires
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
+
     public function getDestinataires()
     {
         return $this->destinataires;
     }
 
-    /**
-     * Set dateEnvoi
-     *
-     * @param \DateTime $dateEnvoi
-     * @return Mail
-     */
     public function setDateEnvoi($dateEnvoi)
     {
         $this->dateEnvoi = $dateEnvoi;
@@ -194,22 +198,13 @@ trait MailEntityTrait
         return $this;
     }
 
-    /**
-     * Get dateEnvoi
-     *
-     * @return \DateTime
-     */
+
     public function getDateEnvoi()
     {
         return $this->dateEnvoi;
     }
 
-    /**
-     * Set envoye
-     *
-     * @param boolean $envoye
-     * @return Mail
-     */
+
     public function setEnvoye($envoye)
     {
         $this->envoye = $envoye;
@@ -217,11 +212,7 @@ trait MailEntityTrait
         return $this;
     }
 
-    /**
-     * Get envoyer
-     *
-     * @return boolean
-     */
+
     public function getEnvoye()
     {
         return $this->envoye;
@@ -243,12 +234,7 @@ trait MailEntityTrait
         return $data;
     }
 
-    /**
-     * Set sujet
-     *
-     * @param string $sujet
-     * @return Mail
-     */
+
     public function setSujet($sujet)
     {
         $this->sujet = $sujet;
@@ -256,22 +242,13 @@ trait MailEntityTrait
         return $this;
     }
 
-    /**
-     * Get sujet
-     *
-     * @return string
-     */
+
     public function getSujet()
     {
         return $this->sujet;
     }
 
-     /**
-     * Set datePrevu
-     *
-     * @param \DateTime $datePrevu
-     * @return Mail
-     */
+
     public function setDatePrevu($datePrevu)
     {
         $this->datePrevu = $datePrevu;
@@ -279,22 +256,12 @@ trait MailEntityTrait
         return $this;
     }
 
-    /**
-     * Get datePrevu
-     *
-     * @return \DateTime
-     */
+
     public function getDatePrevu()
     {
         return $this->datePrevu;
     }
 
-    /**
-     * Set dateEnvoiFini
-     *
-     * @param \DateTime $dateEnvoiFini
-     * @return Mail
-     */
     public function setDateEnvoiFini($dateEnvoiFini)
     {
         $this->dateEnvoiFini = $dateEnvoiFini;
@@ -302,22 +269,11 @@ trait MailEntityTrait
         return $this;
     }
 
-    /**
-     * Get dateEnvoiFini
-     *
-     * @return \DateTime
-     */
     public function getDateEnvoiFini()
     {
         return $this->dateEnvoiFini;
     }
 
-    /**
-     * Set expediteur
-     *
-     * @param string $expediteur
-     * @return Mail
-     */
     public function setExpediteur($expediteur)
     {
         $this->expediteur = $expediteur;
@@ -325,22 +281,11 @@ trait MailEntityTrait
         return $this;
     }
 
-    /**
-     * Get expediteur
-     *
-     * @return string
-     */
     public function getExpediteur()
     {
         return $this->expediteur;
     }
 
-    /**
-     * Set returnPath
-     *
-     * @param string $returnPath
-     * @return Mail
-     */
     public function setReturnPath($returnPath)
     {
         $this->returnPath = $returnPath;
@@ -348,23 +293,11 @@ trait MailEntityTrait
         return $this;
     }
 
-    /**
-     * Get returnPath
-     *
-     * @return string
-     */
     public function getReturnPath()
     {
         return $this->returnPath;
     }
 
-
-    /**
-     * Set etat
-     *
-     * @param string $etat
-     * @return Mail
-     */
     public function setEtat($etat)
     {
         $this->etat = $etat;
@@ -372,23 +305,11 @@ trait MailEntityTrait
         return $this;
     }
 
-    /**
-     * Get etat
-     *
-     * @return string
-     */
     public function getEtat()
     {
         return $this->etat;
     }
 
-
-    /**
-     * Set alias
-     *
-     * @param string $alias
-     * @return Mail
-     */
     public function setAlias($alias)
     {
         $this->alias = $alias;
@@ -396,11 +317,6 @@ trait MailEntityTrait
         return $this;
     }
 
-    /**
-     * Get alias
-     *
-     * @return string
-     */
     public function getAlias()
     {
         return $this->alias;
@@ -409,12 +325,7 @@ trait MailEntityTrait
     public function nbDestinataire(){
         return count($this->getDestinataires());
     }
-    /**
-     * Set sender
-     *
-     * @param string $sender
-     * @return Mail
-     */
+
     public function setSender($sender)
     {
         $this->sender = $sender;
@@ -422,22 +333,11 @@ trait MailEntityTrait
         return $this;
     }
 
-    /**
-     * Get sender
-     *
-     * @return string
-     */
     public function getSender()
     {
         return $this->sender;
     }
 
-    /**
-     * Set infoSender
-     *
-     * @param string $infoSender
-     * @return Mail
-     */
     public function setInfoSender($infoSender)
     {
         $this->infoSender = $infoSender;
@@ -445,11 +345,6 @@ trait MailEntityTrait
         return $this;
     }
 
-    /**
-     * Get infoSender
-     *
-     * @return string
-     */
     public function getInfoSender()
     {
         return $this->infoSender;
@@ -479,12 +374,6 @@ trait MailEntityTrait
         return $sender->statistique($this);
     }
 
-    /**
-     * Set replyTo
-     *
-     * @param string $replyTo
-     * @return Mail
-     */
     public function setReplyTo($replyTo)
     {
         $this->replyTo = $replyTo;
@@ -492,34 +381,17 @@ trait MailEntityTrait
         return $this;
     }
 
-    /**
-     * Get replyTo
-     *
-     * @return string
-     */
     public function getReplyTo()
     {
         return $this->replyTo;
     }
 
 
-    /**
-     * Get the value of html
-     *
-     * @return  string
-     */
     public function getHtml()
     {
         return $this->html;
     }
-
-    /**
-     * Set the value of html
-     *
-     * @param  string  $html
-     *
-     * @return  self
-     */
+    
     public function setHtml(string $html)
     {
         $this->html = $html;
@@ -535,6 +407,8 @@ trait MailEntityTrait
         $this->attachments[] = $attach;
         return $this;
     }
+
+
 
 }
 

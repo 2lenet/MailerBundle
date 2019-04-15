@@ -231,3 +231,54 @@ easy_admin:
                     - { property: mail, label: field.mail }
 ```
                    
+### Entity
+
+You can use your entity:
+
+```yaml
+lle_mailer:
+  template_class: "App\\Entity\\MailTemplate"
+  mail_class: "App\\Entity\\Mail"
+  destinataire_class: "App\\Entity\\MailDestinataire"
+```
+
+Warning: Use 3 entities or 0.
+
+```php
+<?php
+class MailTemplate implements TemplateInterface
+{
+    use TemplateEntityTrait;
+    
+}
+
+class Mail implements MailInterface
+{
+    use MailEntityTrait;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="MailTemplate", cascade={"persist"})
+     * @ORM\JoinColumn(name="template_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
+     */
+    protected $template;
+
+    /**
+     * @ORM\OneToMany(targetEntity="MailDestinataire",mappedBy="mail", cascade={"persist"})
+     */
+    protected $destinataires;
+}
+
+class MailDestinataire implements DestinataireInterface
+{
+    use DestinataireEntityTrait;
+
+    /**
+     *
+     * @ORM\ManyToOne(targetEntity="Mail",cascade={"persist"},inversedBy="destinataires")
+     * @ORM\JoinColumn(name="mail_id", referencedColumnName="id", onDelete="CASCADE")
+     */
+    protected $mail;
+
+}
+```
+

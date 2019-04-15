@@ -1,70 +1,69 @@
 <?php
 namespace Lle\MailerBundle\Service;
 
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Lle\MailerBundle\Entity\Destinataire;
+use Lle\MailerBundle\Entity\DestinataireInterface;
 use Lle\MailerBundle\Entity\Template;
 use Symfony\Component\Routing\RouterInterface;
-use Lle\MailerBundle\MailInterface;
+use Lle\MailerBundle\Entity\MailInterface;
 use Lle\MailerBundle\Entity\Mail;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+
 
 class MailerManager
 {
 
-    /**
-     *
-     * @var EntityManagerInterface
-     */
     protected $em;
-
-    /**
-     *
-     * @var RouterInterface
-     */
     protected $router;
-
-    /**
-     *
-     * @var \Twig_Environment
-     */
     protected $twig;
-
-    /**
-     *
-     * @var \Swift_Mailer
-     */
     protected $mailer;
+    protected $parameters;
 
-    public function __construct(EntityManagerInterface $em, RouterInterface $router, \Swift_Mailer $mailer, \Twig_Environment $twig)
+    public function __construct(EntityManagerInterface $em, RouterInterface $router, \Swift_Mailer $mailer, \Twig_Environment $twig, ParameterBagInterface $parameters)
     {
         $this->twig = $twig;
         $this->em = $em;
         $this->router = $router;
         $this->mailer = $mailer;
+        $this->parameters = $parameters;
+    }
+
+    public function getTemplateRepository() {
+        return $this->em->getRepository($this->parameters->get('lle.mailer.template_class'));
+    }
+
+    public function getMailRepository() {
+        return $this->em->getRepository($this->parameters->get('lle.mailer.mail_class'));
+    }
+
+    public function getDestinataireRepository() {
+        return $this->em->getRepository($this->parameters->get('lle.mailer.destinataire_class'));
     }
 
     protected function findTemplate($code)
     {
         /* @var Template $template */
-        $template = $this->em->getRepository(Template::class)->findOneBy(array(
-            'code' => $code
-        ));
+        $template = $this->getTemplateRepository()->findOneBy(['code' => $code]);
         if (! $template) {
             throw new \Exception('Code ' . $code . ' ne correspond a aucun template d\'email');
         }
         return $template;
     }
 
-    protected function createMail()
+    protected function newInstanceMail()
     {
-        return new Mail();
+        return $this->em->getClassMetadata($this->parameters->get('lle.mailer.mail_class'))->newInstance();
+    }
+
+    protected function newInstanceDestinataire(){
+        return $this->em->getClassMetadata($this->parameters->get('lle.mailer.destinataire_class'))->newInstance();
     }
 
     public function has($code): bool
     {
-        $template = $this->em->getRepository(Template::class)->findOneBy(array(
-            'code' => $code
-        ));
+        $template = $this->getTemplateRepository()->findOneBy(['code' => $code]);
         return (bool) $template;
     }
 
@@ -75,10 +74,10 @@ class MailerManager
      * @return Mail
      * @throws \Exception
      */
-    public function create($code, $destinataires, array $expediteur = [], $returnPath = null): Mail
+    public function create($code, $destinataires, array $expediteur = [], $returnPath = null): MailInterface
     {
         $template = $this->findTemplate($code);
-        $mail = $this->createMail();
+        $mail = $this->newInstanceMail();
         foreach ($destinataires as $k => $destinataire) {
             $mail->addDestinataire($this->createDestinataire($k, $destinataire));
         }
@@ -90,7 +89,7 @@ class MailerManager
         if ($returnPath) {
             $mail->setReturnPath($returnPath);
         }
-
+        //dd($mail);
         return $this->save($mail);
     }
 
@@ -101,7 +100,7 @@ class MailerManager
      * @return Mail
      * @throws \Exception
      */
-    public function createFromHtml($html, $sujet, $destinataires, array $expediteur = [], $returnPath = null): Mail
+    public function createFromHtml($html, $sujet, $destinataires, array $expediteur = [], $returnPath = null): MailInterface
     {
         $mail = $this->createMail();
         foreach ($destinataires as $k => $destinataire) {
@@ -119,12 +118,12 @@ class MailerManager
         return $this->save($mail);
     }
 
-    public function send(Mail $mail): Mail
+    public function send(MailInterface $mail): MailInterface
     {
         $mail->setDateEnvoi(new \Datetime());
 
         $templateHtml = $this->twig->createTemplate($mail->getTemplate()->getHtml());
-        $templateText = $this->twig->createTemplate($mail->getTemplate()->getText());
+        $templateText = $this->twig->createTemplate($mail->getTemplate()->getText() ?? '');
         $templateSujet = $this->twig->createTemplate($mail->getTemplate()->getSujet());
         if ($mail->getExpediteur()) {
             $expediteur = array(
@@ -148,7 +147,7 @@ class MailerManager
 
             // $html = $mail->rewriteUrl($destinataire, $urlRedirect, $html);
             // $html .= '<img src="' . $urlTracking . '" alt="">';
-            if ($destinataire->isValidEmail(true)) {
+            if ($destinataire->isValidEmail($this->parameters->get('lle.mailer.check_mx'))) {
                 $message = (new \Swift_Message())->setSubject($sujet)
                     ->setFrom($expediteur)
                     ->setReturnPath($mail->getReturnPath())
@@ -174,9 +173,9 @@ class MailerManager
         return $this->save($mail);
     }
 
-    public function createDestinataire($email, $data): Destinataire
+    public function createDestinataire($email, $data): DestinataireInterface
     {
-        $destinataire = new Destinataire();
+        $destinataire = $this->newInstanceDestinataire();
         $destinataire->setData($data);
         $destinataire->setEmail($email);
         return $destinataire;

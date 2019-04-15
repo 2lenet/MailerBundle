@@ -23,7 +23,12 @@ class LleMailerExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yaml');
         $configuration = new Configuration();
-        $processedConfig =  $this->processConfiguration($configuration, $configs);
+
+        $config =  $this->processConfiguration($configuration, $configs);
+        $container->setParameter( 'lle.mailer.mail_class', $config[ 'mail_class' ] );
+        $container->setParameter( 'lle.mailer.destinataire_class', $config[ 'destinataire_class' ] );
+        $container->setParameter( 'lle.mailer.template_class', $config[ 'template_class' ] );
+        $container->setParameter('lle.mailer.check_mx', $config['check_mx']);
     }
 
 }
