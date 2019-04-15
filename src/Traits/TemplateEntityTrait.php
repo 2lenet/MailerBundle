@@ -55,6 +55,25 @@ trait TemplateEntityTrait
      */
     protected $expediteurName;
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="bigint", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
     public function __toString()
     {
         return (string) $this->getSujet();
