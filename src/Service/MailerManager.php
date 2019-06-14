@@ -158,6 +158,9 @@ class MailerManager
                 foreach($mail->getAttachments() as $attach){
                     $message->attach(\Swift_Attachment::fromPath($attach));
                 }
+                foreach ($mail->getStreamAttachments() as $streamAttachment){
+                    $message->attach(new \Swift_Attachment($streamAttachment['data'], $streamAttachment['filename'], $streamAttachment['contentType']));
+                }
                 $mail->setEnvoye($this->mailer->send($message));
                 $destinataire->setSuccess(TRUE);
             } else {
