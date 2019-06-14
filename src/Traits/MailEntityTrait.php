@@ -418,14 +418,6 @@ trait MailEntityTrait
         return $this->streamAttachments;
     }
 
-    /**
-     * @param array $streamAttachments
-     */
-    public function setStreamAttachments (array $streamAttachments): void
-    {
-        $this->streamAttachments = $streamAttachments;
-    }
-
     public function addStreamAttachments (String $data, String $filename, String $contentType): void
     {
         $this->streamAttachments[] = [
