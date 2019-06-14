@@ -282,3 +282,46 @@ class MailDestinataire implements DestinataireInterface
 }
 ```
 
+## Attachment
+
+In order to send attachments with your email, you can use streamAttachment or attach a stored file. 
+
+### Stored file
+
+```php
+ $mail->addAttachment(path/to/your/file);
+``` 
+
+For example, you can use it like that: 
+
+```php
+$mail->addAttachment($this->kernel->getProjectDir() . '/' . $pdf->getPath());
+``` 
+
+### Dynamically created file
+
+Another way, to send a file with an email, is to use "streamAttachment".
+
+```php
+ $mail->addStreamAttachments(String $data, String $filename, String $contentType);
+``` 
+
+$data is the content of the file that you want to send.     
+$filename is the name of the file you want to send.     
+$contentType is type of the file you want to send. 
+
+#### Remove all streamAttachment
+
+In order to remove all attached dynamically created file you can use this method:
+
+```php
+ $mail->removeAllAttachments();
+``` 
+
+#### Get all streamAttachment
+
+To get all file (not stored, created dynamically) you can use this method:
+
+```php
+ $mail->getStreamAttachments();
+``` 
