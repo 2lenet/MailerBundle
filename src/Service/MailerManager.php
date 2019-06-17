@@ -45,7 +45,12 @@ class MailerManager
     protected function findTemplate($code)
     {
         /* @var Template $template */
-        $template = $this->getTemplateRepository()->findOneBy(['code' => $code]);
+        if(is_array($code)){
+            $template = $this->getTemplateRepository()->findOneBy($code);
+        }else{
+            $template = $this->getTemplateRepository()->findOneBy(['code' => $code]);
+        }
+
         if (! $template) {
             throw new \Exception('Code ' . $code . ' ne correspond a aucun template d\'email');
         }
@@ -76,6 +81,10 @@ class MailerManager
      */
     public function create($code, $destinataires, array $expediteur = [], $returnPath = null): MailInterface
     {
+        return $this->save($this->generate($code,$destinataires,$expediteur,$returnPath));
+    }
+
+    public function generate($code, $destinataires, array $expediteur = [], $returnPath = null): MailInterface{
         $template = $this->findTemplate($code);
         $mail = $this->newInstanceMail();
         foreach ($destinataires as $k => $destinataire) {
@@ -89,8 +98,7 @@ class MailerManager
         if ($returnPath) {
             $mail->setReturnPath($returnPath);
         }
-        //dd($mail);
-        return $this->save($mail);
+        return $mail;
     }
 
     /**
@@ -102,7 +110,7 @@ class MailerManager
      */
     public function createFromHtml($html, $sujet, $destinataires, array $expediteur = [], $returnPath = null): MailInterface
     {
-        $mail = $this->createMail();
+        $mail = $this->newInstanceMail();
         foreach ($destinataires as $k => $destinataire) {
             $mail->addDestinataire($this->createDestinataire($k, $destinataire));
         }
