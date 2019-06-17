@@ -124,6 +124,8 @@ trait MailEntityTrait
      */
     protected $attachments = [];
 
+    protected $streamAttachments = [];
+
     /**
      * @var integer
      *
@@ -408,7 +410,25 @@ trait MailEntityTrait
         return $this;
     }
 
+    /**
+     * @return array
+     */
+    public function getStreamAttachments (): array
+    {
+        return $this->streamAttachments;
+    }
 
+    public function addStreamAttachments (String $data, String $filename, String $contentType): void
+    {
+        $this->streamAttachments[] = [
+            "data" => $data,
+            "filename" => $filename,
+            "contentType" => $contentType,
+        ];
+    }
 
+    public function removeAllAttachments () {
+        $this->streamAttachments = [];
+    }
 }
 
